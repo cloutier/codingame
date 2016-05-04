@@ -1,0 +1,62 @@
+import System.IO
+import System.Random
+import Control.Monad
+import Data.List (transpose)
+
+type Grid = [String]
+
+main :: IO ()
+main = do
+    hSetBuffering stdout NoBuffering -- DO NOT REMOVE
+    
+    -- Auto-generated code below aims at helping you parse
+    -- the standard input according to the problem statement.
+    
+    loop
+
+loop :: IO ()
+loop = do
+    g <- newStdGen
+    paires <- replicateM 8 $ do
+        input_line <- getLine
+        let input = words input_line
+        let colora = read (input!!0) :: Int -- color of the first block
+        let colorb = read (input!!1) :: Int -- color of the attached block
+        return (colora, colorb)
+    
+    myBoard <- replicateM 12 $ do
+        input_line <- getLine
+        let row = input_line :: String
+        return (row)
+    
+    otherBoard <- replicateM 12 $ do
+        input_line <- getLine
+        let row = input_line :: String -- One line of the map ('.' = empty, '0' = skull block, '1' to '5' = colored block)
+        return (row)
+    
+    hPutStrLn stderr $ show $ colN 1 myBoard
+    
+    c <- do 
+        rand <- randomRIO (0, 50)
+        let res = ((replicate 45 0) ++ (replicate 100 1)) !! rand
+        return (res)
+   
+    putStrLn $ show $ choose myBoard (head paires)
+    
+    loop
+
+choose :: Grid -> (Int, Int) -> Int
+choose grid pair
+    | not $ color `elem` (colN (fst pair) grid) = fst pair
+    | not $ color `elem` (colN (fst pair) grid) = 1 + (fst pair)
+    | otherwise = fst pair
+    where color = head $ show (fst pair)
+    
+lineHeight:: Grid -> Int -> Int
+lineHeight grid line = length $ colN line grid
+
+colN :: Int -> Grid -> String
+colN n matrix = transpose matrix !! n 
+
+--bestChoice :: [Int]
+randomNumber seed = take 10 . randomRs (0, 99) . mkStdGen $ seed
